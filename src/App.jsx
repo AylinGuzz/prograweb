@@ -50,6 +50,11 @@ function App() {
           const favorito = esFavorito(item.id);
           return (
             <div key={item.id} style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '8px', background: '#fff', color: '#333' }}>
+              <img
+                src={item.imagen ? item.imagen : "https://via.placeholder.com/300x450?text"}
+                alt={item.titulo}
+                style={{width: '100%', height: '200px', objectFit: 'cover', borderRadius: '4px', marginBottom: '10px'}}
+              />  
               <h3 style={{ margin: '0 0 10px 0' }}>{item.titulo}</h3>
               <p style={{ margin: '5px 0' }}><strong>Tipo:</strong> {item.tipo}</p>
               <p style={{ margin: '5px 0' }}><strong>Género:</strong> {item.genero} ({item.año})</p>
