@@ -1,121 +1,80 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react'
+import { catalogo } from './data/catalogo'
+import Header from './components/Header'
+import Filtros from './components/Filtros'
+import ListaContenido from './components/ListaContenido'
+import DetalleModal from './components/DetalleModal'
+
+const generos = ['todos', ...new Set(catalogo.map((i) => i.genero))]
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [vista, setVista] = useState('catalogo')
+  const [busqueda, setBusqueda] = useState('')
+  const [tipo, setTipo] = useState('todos')
+  const [genero, setGenero] = useState('todos')
+  const [seleccionado, setSeleccionado] = useState(null)
+  const [favoritos, setFavoritos] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('favoritos')) || []
+    } catch {
+      return []
+    }
+  })
+
+  useEffect(() => {
+    localStorage.setItem('favoritos', JSON.stringify(favoritos))
+  }, [favoritos])
+
+  const toggleFav = (id) => {
+    setFavoritos((prev) =>
+      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
+    )
+  }
+
+  const base =
+    vista === 'favoritos'
+      ? catalogo.filter((i) => favoritos.includes(i.id))
+      : catalogo
+
+  const visibles = base.filter(
+    (i) =>
+      i.titulo.toLowerCase().includes(busqueda.toLowerCase()) &&
+      (tipo === 'todos' || i.tipo === tipo) &&
+      (genero === 'todos' || i.genero === genero)
+  )
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <div className="app">
+      <Header vista={vista} setVista={setVista} totalFavs={favoritos.length} />
+      <Filtros
+        busqueda={busqueda}
+        setBusqueda={setBusqueda}
+        tipo={tipo}
+        setTipo={setTipo}
+        genero={genero}
+        setGenero={setGenero}
+        generos={generos}
+      />
+      <ListaContenido
+        items={visibles}
+        favoritos={favoritos}
+        onSeleccionar={setSeleccionado}
+        onToggleFav={toggleFav}
+        mensajeVacio={
+          vista === 'favoritos'
+            ? 'Aún no tienes favoritos. Marca algunos con el corazón.'
+            : 'No se encontraron resultados.'
+        }
+      />
+      {seleccionado && (
+        <DetalleModal
+          item={seleccionado}
+          esFavorito={favoritos.includes(seleccionado.id)}
+          onToggleFav={toggleFav}
+          onCerrar={() => setSeleccionado(null)}
+        />
+      )}
+    </div>
   )
 }
 
