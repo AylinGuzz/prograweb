@@ -1,4 +1,12 @@
-function Filtros({ filtroTipo, onCambiarTipo }) {
+import "./Filtros.css";
+
+function Filtros({
+  filtroTipo,
+  onCambiarTipo,
+  filtroGenero,
+  onCambiarGenero,
+  generos = [],
+}) {
   const tipos = [
     { valor: "todas", etiqueta: "Todas" },
     { valor: "pelicula", etiqueta: "Películas" },
@@ -6,7 +14,7 @@ function Filtros({ filtroTipo, onCambiarTipo }) {
   ];
 
   return (
-    <div>
+    <div className="filtros">
       {tipos.map((t) => (
         <button
           key={t.valor}
@@ -16,6 +24,18 @@ function Filtros({ filtroTipo, onCambiarTipo }) {
           {t.etiqueta}
         </button>
       ))}
+
+      <select
+        value={filtroGenero}
+        onChange={(e) => onCambiarGenero(e.target.value)}
+      >
+        <option value="todos">Todos los géneros</option>
+        {generos.map((g) => (
+          <option key={g} value={g}>
+            {g}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
