@@ -1,0 +1,23 @@
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.filtros button,
+.filtros select {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #888;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.filtros button.activo {
+  background: #f5c518;
+  color: #000;
+  border-color: #f5c518;
+  font-weight: bold;
+}
